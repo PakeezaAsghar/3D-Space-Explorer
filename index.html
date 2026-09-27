@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en" class="dark">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+    <title>QUASAR | 3D Space Explorer & Planetarium</title>
+    <meta name="description" content="QUASAR: An interactive 3D digital planetarium rendered with Three.js and WebGL. Explore the Sun, all 8 planets, Earth's Moon, real orbital simulations, and scientific metrics." />
+    <meta property="og:title" content="QUASAR | 3D Space Explorer & Planetarium" />
+    <meta property="og:description" content="QUASAR: An interactive 3D digital planetarium rendered with Three.js and WebGL. Explore the Sun, all 8 planets, Earth's Moon, real orbital simulations, and scientific metrics." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Space+Grotesk:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('theme') || localStorage.getItem('space_theme');
+          var theme = (saved === 'light') ? 'light' : 'dark';
+          document.documentElement.setAttribute('data-theme', theme);
+          document.documentElement.className = theme;
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="antialiased selection:bg-cyan-500/30 selection:text-cyan-200 overflow-x-hidden min-h-screen">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>
+

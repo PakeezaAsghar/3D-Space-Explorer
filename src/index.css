@@ -1,0 +1,295 @@
+@import "tailwindcss";
+
+@layer base {
+  :root,
+  [data-theme="dark"],
+  html.dark {
+    --font-display: 'Space Grotesk', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, sans-serif;
+    --font-mono: 'JetBrains Mono', monospace;
+
+    /* Theme Tokens - Dark (Deep space aesthetic) */
+    --bg-primary: #05070f;
+    --bg-secondary: #080d1e;
+    --surface: rgba(13, 20, 38, 0.75);
+    --surface-glass: rgba(9, 14, 28, 0.78);
+    --surface-glass-border: rgba(255, 255, 255, 0.12);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+    --border: rgba(255, 255, 255, 0.1);
+    --border-strong: rgba(255, 255, 255, 0.22);
+    --accent: #06b6d4;
+    --accent-hover: #22d3ee;
+    --accent-soft: rgba(6, 182, 212, 0.15);
+    --card-bg: rgba(13, 20, 38, 0.7);
+    --card-border: rgba(255, 255, 255, 0.1);
+    --header-bg: rgba(9, 14, 28, 0.82);
+    --footer-bg: #05070f;
+    --dock-bg: rgba(9, 14, 28, 0.85);
+    --input-bg: rgba(5, 7, 15, 0.85);
+    --input-border: rgba(255, 255, 255, 0.15);
+    --select-bg: #090e1c;
+    --select-text: #f8fafc;
+    --hero-fade: #05070f;
+    --shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.45);
+  }
+
+  [data-theme="light"],
+  html.light {
+    /* Theme Tokens - Light (Scientific observatory aesthetic) */
+    --bg-primary: #f8fafc;
+    --bg-secondary: #f1f5f9;
+    --surface: rgba(255, 255, 255, 0.92);
+    --surface-glass: rgba(255, 255, 255, 0.88);
+    --surface-glass-border: rgba(15, 23, 42, 0.14);
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #64748b;
+    --border: rgba(15, 23, 42, 0.12);
+    --border-strong: rgba(15, 23, 42, 0.24);
+    --accent: #0891b2;
+    --accent-hover: #0e7490;
+    --accent-soft: rgba(8, 145, 178, 0.12);
+    --card-bg: rgba(255, 255, 255, 0.92);
+    --card-border: rgba(15, 23, 42, 0.12);
+    --header-bg: rgba(255, 255, 255, 0.94);
+    --footer-bg: #e2e8f0;
+    --dock-bg: rgba(255, 255, 255, 0.95);
+    --input-bg: #ffffff;
+    --input-border: rgba(15, 23, 42, 0.2);
+    --select-bg: #ffffff;
+    --select-text: #0f172a;
+    --hero-fade: #f8fafc;
+    --shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08);
+  }
+
+  body {
+    font-family: var(--font-sans);
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    transition: background-color 200ms ease, color 200ms ease;
+  }
+
+  h1, h2, h3, h4, .font-display {
+    font-family: var(--font-display);
+    color: var(--text-primary);
+  }
+
+  .font-mono {
+    font-family: var(--font-mono);
+  }
+}
+
+/* Smooth transition on UI elements */
+body, header, footer, .glass-panel, aside, .theme-page, .theme-card, input, select {
+  transition: background-color 200ms ease, color 200ms ease, border-color 200ms ease, box-shadow 200ms ease;
+}
+
+/* Custom subtle scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg-primary);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.3);
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--accent);
+}
+
+/* Glass panel utility using tokens */
+.glass-panel {
+  background: var(--surface-glass);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--surface-glass-border);
+  box-shadow: var(--shadow);
+  color: var(--text-primary);
+}
+
+/* Theme page container */
+.theme-page {
+  background-color: var(--bg-primary);
+  color: var(--text-primary);
+}
+
+/* Hero ambient fade gradients */
+.hero-fade-top {
+  background: linear-gradient(to bottom, var(--hero-fade) 0%, transparent 100%);
+}
+
+.hero-fade-bottom {
+  background: linear-gradient(to top, var(--hero-fade) 0%, transparent 100%);
+}
+
+/* Light mode specific element adaptations */
+html.light body,
+html.light .theme-page {
+  background-color: #f8fafc;
+  color: #0f172a;
+}
+
+html.light h1,
+html.light h2,
+html.light h3,
+html.light h4,
+html.light .font-display {
+  color: #0f172a !important;
+}
+
+html.light .glass-panel {
+  background: rgba(255, 255, 255, 0.9) !important;
+  border-color: rgba(15, 23, 42, 0.12) !important;
+  color: #0f172a !important;
+  box-shadow: 0 4px 20px -2px rgba(15, 23, 42, 0.08) !important;
+}
+
+html.light header {
+  background: rgba(255, 255, 255, 0.95) !important;
+  border-bottom: 1px solid rgba(15, 23, 42, 0.1) !important;
+}
+
+html.light header a,
+html.light header span.text-white {
+  color: #0f172a !important;
+}
+
+html.light header nav a:not(.text-cyan-400) {
+  color: #475569 !important;
+}
+
+html.light header nav a:hover {
+  color: #0f172a !important;
+}
+
+html.light footer {
+  background-color: #e2e8f0 !important;
+  border-top: 1px solid rgba(15, 23, 42, 0.12) !important;
+  color: #475569 !important;
+}
+
+html.light footer span.text-white {
+  color: #0f172a !important;
+}
+
+/* Light mode text mappings */
+html.light .text-white {
+  color: #0f172a;
+}
+
+html.light .text-slate-100 {
+  color: #0f172a !important;
+}
+
+html.light .text-slate-200 {
+  color: #1e293b !important;
+}
+
+html.light .text-slate-300 {
+  color: #334155 !important;
+}
+
+html.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .text-slate-500 {
+  color: #64748b !important;
+}
+
+/* Light mode border mappings */
+html.light .border-white\/5,
+html.light .border-white\/10,
+html.light .border-white\/15,
+html.light .border-white\/20 {
+  border-color: rgba(15, 23, 42, 0.12) !important;
+}
+
+/* Light mode background utility mappings */
+html.light .bg-white\/5,
+html.light .bg-white\/10,
+html.light .bg-white\/15 {
+  background-color: rgba(15, 23, 42, 0.05) !important;
+}
+
+html.light .bg-black\/20,
+html.light .bg-black\/30,
+html.light .bg-black\/40 {
+  background-color: rgba(241, 245, 249, 0.85) !important;
+}
+
+html.light .bg-slate-900 {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+
+html.light .bg-slate-950 {
+  background-color: #f8fafc !important;
+}
+
+html.light select {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border-color: rgba(15, 23, 42, 0.2) !important;
+}
+
+/* CRITICAL: Keep 3D space viewports dark in both modes */
+.space-viewport,
+.space-viewport canvas,
+canvas.cursor-grab {
+  background-color: #05070f !important;
+}
+
+html.light .space-viewport {
+  background-color: #05070f !important;
+  border-color: rgba(15, 23, 42, 0.2) !important;
+}
+
+/* Buttons with accent colors retain their intended high-contrast colors */
+.bg-cyan-400,
+.bg-cyan-500 {
+  color: #05070f !important;
+}
+
+/* Hero section text over 3D space backdrop stays crisp white in all modes */
+.hero-title-white,
+html.light .hero-title-white,
+html.light h1.hero-title-white {
+  color: #ffffff !important;
+  text-shadow: 0 2px 14px rgba(0, 0, 0, 0.85);
+}
+
+.hero-subtitle-white,
+html.light .hero-subtitle-white,
+html.light p.hero-subtitle-white {
+  color: rgba(255, 255, 255, 0.95) !important;
+  text-shadow: 0 1px 8px rgba(0, 0, 0, 0.8);
+}
+
+/* Hero gradient text on SYSTEM */
+.hero-gradient-text,
+html.light .hero-gradient-text,
+html.light span.hero-gradient-text {
+  color: transparent !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  -webkit-background-clip: text !important;
+}
+
+/* Reduced motion preference */
+@media (prefers-reduced-motion: reduce) {
+  *, ::before, ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

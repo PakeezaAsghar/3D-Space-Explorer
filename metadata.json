@@ -1,0 +1,6 @@
+{
+  "name": "3D Space Explorer - Interactive Digital Planetarium",
+  "description": "An interactive digital planetarium rendered with real 3D Three.js/WebGL celestial bodies, realistic planetary surfaces, orbital simulation, comparisons, and scientific exploration.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
