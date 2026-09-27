@@ -1,9 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
-import { Search, Sun, Moon, Menu, X, Volume2, VolumeX } from 'lucide-react';
+import { Search, Sun, Moon, Menu, X } from 'lucide-react';
 import { usePlanetarium } from '../context/PlanetariumContext';
 import { SpaceExplorerLogo } from './QuasarLogo';
-import { sound } from '../utils/audio';
 
 export const Navbar: React.FC = () => {
   const {
@@ -13,13 +12,17 @@ export const Navbar: React.FC = () => {
   } = usePlanetarium();
 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [isMuted, setIsMuted] = useState(() => sound.getIsMuted());
+  const [isScrolled, setIsScrolled] = useState(false);
   const location = useLocation();
 
-  const handleToggleSound = () => {
-    const muted = sound.toggleMute();
-    setIsMuted(muted);
-  };
+  useEffect(() => {
+    const handleScroll = () => {
+      setIsScrolled(window.scrollY > 8);
+    };
+    handleScroll();
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navLinks = [
     { to: '/', label: 'Home' },
@@ -31,12 +34,17 @@ export const Navbar: React.FC = () => {
   ];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#05070f]/90 backdrop-blur-md border-b border-white/10 transition-colors">
+    <header
+      className={`sticky top-0 z-50 w-full transition-all duration-200 ${
+        isScrolled
+          ? 'bg-[#05070f]/95 shadow-2xl shadow-black/60 border-b border-white/15 backdrop-blur-xl'
+          : 'bg-[#05070f]/90 border-b border-white/10 backdrop-blur-md'
+      }`}
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Zone 1: Space Explorer Logo */}
         <Link
           to="/"
-          onClick={() => sound.playClick()}
           className="flex items-center group focus:outline-none"
           aria-label="Space Explorer Home"
         >
@@ -51,7 +59,6 @@ export const Navbar: React.FC = () => {
               <NavLink
                 key={link.to}
                 to={link.to}
-                onClick={() => sound.playClick()}
                 className={`transition-colors py-2 relative text-sm ${
                   isActive
                     ? 'text-cyan-400 font-semibold'
@@ -67,13 +74,12 @@ export const Navbar: React.FC = () => {
           })}
         </nav>
 
-        {/* Zone 3: Utility actions: Search, Theme, Sound, Menu */}
+        {/* Zone 3: Utility actions: Search, Theme, Menu */}
         <div className="flex items-center gap-2.5 sm:gap-3">
           {/* Quick Search Button */}
           <button
             type="button"
             onClick={() => {
-              sound.playClick();
               setSearchOpen(true);
             }}
             className="p-2 text-slate-300 hover:text-white transition-colors cursor-pointer"
@@ -99,26 +105,10 @@ export const Navbar: React.FC = () => {
             )}
           </button>
 
-          {/* Audio Toggle Button */}
-          <button
-            type="button"
-            onClick={handleToggleSound}
-            className="p-2 text-slate-300 hover:text-white transition-colors cursor-pointer"
-            title={isMuted ? 'Unmute audio effects' : 'Mute audio effects'}
-            aria-label={isMuted ? 'Unmute audio effects' : 'Mute audio effects'}
-          >
-            {isMuted ? (
-              <VolumeX className="w-4 h-4 text-slate-400" />
-            ) : (
-              <Volume2 className="w-4 h-4 text-cyan-400" />
-            )}
-          </button>
-
           {/* Mobile Menu Hamburger */}
           <button
             type="button"
             onClick={() => {
-              sound.playClick();
               setMobileMenuOpen(!mobileMenuOpen);
             }}
             className="p-2 text-slate-300 hover:text-white transition-colors cursor-pointer md:hidden"
@@ -139,7 +129,6 @@ export const Navbar: React.FC = () => {
                 key={link.to}
                 to={link.to}
                 onClick={() => {
-                  sound.playClick();
                   setMobileMenuOpen(false);
                 }}
                 className={`block px-3 py-2 rounded-lg text-sm font-medium transition-colors ${

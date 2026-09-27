@@ -4,8 +4,6 @@ import {
   Compass, 
   Globe, 
   Cpu, 
-  Volume2, 
-  Play, 
   Activity, 
   Info, 
   RefreshCw,
@@ -16,7 +14,7 @@ import {
 import { sound } from '../utils/audio';
 import astronautEarthImg from '../assets/images/astronaut_earth_1790504379476.jpg';
 
-type PlaygroundTab = 'textures' | 'acoustics' | 'lerp';
+type PlaygroundTab = 'textures' | 'lerp';
 type TexturePreset = 'gas-giant' | 'terrestrial' | 'solar-plasma' | 'ice-world';
 
 interface ScalePlanet {
@@ -47,11 +45,6 @@ export const About: React.FC = () => {
   const [selectedScaleIndex, setSelectedScaleIndex] = useState<number>(2); // Earth
   const [scaleMode, setScaleMode] = useState<'logarithmic' | 'true'>('logarithmic');
   
-  // Audio playground state
-  const [activeTone, setActiveTone] = useState<string | null>(null);
-  const audioCtxRef = useRef<AudioContext | null>(null);
-  const currentOscRef = useRef<OscillatorNode | null>(null);
-
   // Canvas ref for procedural texture preview
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
@@ -147,64 +140,6 @@ export const About: React.FC = () => {
     animId = requestAnimationFrame(updateLerp);
     return () => cancelAnimationFrame(animId);
   }, [simTargetPos, lerpSpeed]);
-
-  // Audio tone synthesizer function
-  const playHarmonicFrequency = (name: string, freq: number) => {
-    try {
-      if (!audioCtxRef.current) {
-        const AudioCtx = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
-        audioCtxRef.current = new AudioCtx();
-      }
-
-      const ctx = audioCtxRef.current;
-      if (ctx.state === 'suspended') {
-        ctx.resume();
-      }
-
-      // Stop previous
-      if (currentOscRef.current) {
-        currentOscRef.current.stop();
-        currentOscRef.current.disconnect();
-        currentOscRef.current = null;
-      }
-
-      if (activeTone === name) {
-        setActiveTone(null);
-        return;
-      }
-
-      const osc = ctx.createOscillator();
-      const gain = ctx.createGain();
-
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, ctx.currentTime);
-
-      gain.gain.setValueAtTime(0.001, ctx.currentTime);
-      gain.gain.linearRampToValueAtTime(0.08, ctx.currentTime + 0.1);
-      gain.gain.exponentialRampToValueAtTime(0.0001, ctx.currentTime + 1.8);
-
-      osc.connect(gain);
-      gain.connect(ctx.destination);
-
-      osc.start();
-      currentOscRef.current = osc;
-      setActiveTone(name);
-
-      setTimeout(() => {
-        if (activeTone === name) setActiveTone(null);
-      }, 1800);
-    } catch {
-      // Audio blocked or unsupported
-    }
-  };
-
-  const planetaryResonances = [
-    { name: 'Sun', freq: 126.22, note: 'B2 (-32 cents)', desc: 'Fundamental solar rotational period translated into audible acoustic octaves' },
-    { name: 'Earth (Year)', freq: 136.10, note: 'C#3 (-13 cents)', desc: 'The "Om" frequency representing Earth’s 365.25-day heliocentric orbit' },
-    { name: 'Mars', freq: 144.72, note: 'D3 (+2 cents)', desc: 'Acoustic translation of Mars’ 686.98-day orbital revolution' },
-    { name: 'Jupiter', freq: 183.58, note: 'F#3 (+38 cents)', desc: 'Harmonic resonance derived from Jupiter’s 11.86-year orbital period' },
-    { name: 'Saturn', freq: 147.85, note: 'D3 (+39 cents)', desc: 'The golden ring tone derived from Saturn’s 29.46-year solar voyage' }
-  ];
 
   const currentPlanet = SCALE_PLANETS[selectedScaleIndex];
 
@@ -308,7 +243,6 @@ export const About: React.FC = () => {
           <div className="flex items-center gap-1.5 p-1 rounded-xl bg-slate-900 border border-white/10 self-start sm:self-auto">
             <button
               onClick={() => {
-                sound.playClick();
                 setActiveTab('textures');
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
@@ -321,20 +255,6 @@ export const About: React.FC = () => {
             </button>
             <button
               onClick={() => {
-                sound.playClick();
-                setActiveTab('acoustics');
-              }}
-              className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
-                activeTab === 'acoustics'
-                  ? 'bg-cyan-500 text-slate-950 font-bold shadow-sm'
-                  : 'text-slate-400 hover:text-white'
-              }`}
-            >
-              Cosmic Acoustics
-            </button>
-            <button
-              onClick={() => {
-                sound.playClick();
                 setActiveTab('lerp');
               }}
               className={`px-3 py-1.5 rounded-lg text-xs font-mono transition-all cursor-pointer ${
@@ -358,7 +278,6 @@ export const About: React.FC = () => {
                 </span>
                 <button
                   onClick={() => {
-                    sound.playClick();
                     setTextureSeed(prev => prev + 1);
                   }}
                   className="flex items-center gap-1 text-[11px] font-mono text-slate-300 hover:text-cyan-300 bg-white/10 px-2.5 py-1 rounded-md transition-colors cursor-pointer"
@@ -402,7 +321,6 @@ export const About: React.FC = () => {
                     <button
                       key={preset}
                       onClick={() => {
-                        sound.playClick();
                         setTexturePreset(preset);
                       }}
                       className={`px-3 py-2 rounded-xl text-xs font-mono capitalize transition-all cursor-pointer border text-left ${
@@ -436,59 +354,6 @@ export const About: React.FC = () => {
                   <span>Micro-Cratering</span>
                 </div>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Tab 2: Cosmic Acoustics & Web Audio API */}
-        {activeTab === 'acoustics' && (
-          <div className="space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
-              <p className="text-xs text-slate-300 leading-relaxed max-w-xl">
-                The vacuum of space carries no direct acoustic vibrations, but every rotating celestial body exhibits characteristic orbital periods. Hans Cousto’s <em>Law of the Cosmic Octave</em> transposes these orbital cycles into audible sound waves. Click any body to synthesize its tone:
-              </p>
-              <div className="flex items-center gap-1.5 text-xs font-mono text-cyan-400">
-                <Volume2 className="w-4 h-4" />
-                <span>Web Audio API Sine Engine</span>
-              </div>
-            </div>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 pt-2">
-              {planetaryResonances.map(body => {
-                const isPlaying = activeTone === body.name;
-                return (
-                  <button
-                    key={body.name}
-                    onClick={() => playHarmonicFrequency(body.name, body.freq)}
-                    className={`p-4 rounded-xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
-                      isPlaying
-                        ? 'border-cyan-400 bg-cyan-950/60 shadow-lg shadow-cyan-500/20'
-                        : 'border-white/10 bg-white/5 hover:border-cyan-500/40 hover:bg-white/10'
-                    }`}
-                  >
-                    <div className="flex items-center justify-between mb-2">
-                      <span className="text-sm font-bold font-display text-white">
-                        {body.name}
-                      </span>
-                      <span className="px-2 py-0.5 rounded text-[11px] font-mono bg-cyan-400/20 text-cyan-300 border border-cyan-400/30">
-                        {body.freq} Hz
-                      </span>
-                    </div>
-
-                    <p className="text-[11px] text-slate-400 leading-relaxed mb-3">
-                      {body.desc}
-                    </p>
-
-                    <div className="flex items-center justify-between text-[11px] font-mono text-slate-500 pt-2 border-t border-white/5">
-                      <span>Note: {body.note}</span>
-                      <span className="flex items-center gap-1 text-cyan-400 font-semibold">
-                        <Play className="w-3 h-3 fill-current" />
-                        <span>{isPlaying ? 'Synthesizing...' : 'Play Frequency'}</span>
-                      </span>
-                    </div>
-                  </button>
-                );
-              })}
             </div>
           </div>
         )}

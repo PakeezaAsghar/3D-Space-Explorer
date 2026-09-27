@@ -21,13 +21,6 @@ export const Footer: React.FC = () => {
             <p className="text-slate-400 text-xs max-w-md leading-relaxed">
               An interactive 3D digital planetarium designed for students, educators, and space enthusiasts to inspect the planets of our solar system with real-time WebGL rendering.
             </p>
-            <div className="flex items-center gap-2 text-[11px] text-slate-500 font-mono">
-              <span>Three.js WebGL</span>
-              <span aria-hidden="true">·</span>
-              <span>React 19</span>
-              <span aria-hidden="true">·</span>
-              <span>Procedural Shaders</span>
-            </div>
           </div>
 
           {/* Quick Links */}
@@ -70,21 +63,12 @@ export const Footer: React.FC = () => {
                   About the Project
                 </Link>
               </li>
-              <li>
-                <span className="text-slate-500">Academic Project Showcase</span>
-              </li>
-              <li>
-                <span className="text-slate-500">Curated Astronomical Telemetry</span>
-              </li>
             </ul>
           </div>
         </div>
 
-        {/* Disclaimer & Bottom Row */}
+        {/* Bottom Row */}
         <div className="pt-6 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-center sm:text-left text-[11px] text-slate-500">
-          <p className="max-w-xl">
-            Planetary measurements and distances are presented for educational purposes and may be rounded. The interactive 3D solar system uses visual scaling optimized for exploration rather than exact astronomical scale.
-          </p>
           <div className="font-mono text-slate-400">
             &copy; 2026 QUASAR · Space Explorer. All rights reserved.
           </div>

@@ -120,12 +120,13 @@ export const SolarSystemCanvas: React.FC<SolarSystemCanvasProps> = ({
 
     if (!selectedPlanetId) {
       // Zoom out to global solar system view
-      stateRef.current.camTargetPos = isCompact
-        ? new THREE.Vector3(-14, 46, 68)
-        : new THREE.Vector3(0, 75, 100);
-      stateRef.current.camLookAtTarget = isCompact
-        ? new THREE.Vector3(10, 0, 0)
-        : new THREE.Vector3(0, 0, 0);
+      const isMob = typeof window !== 'undefined' && (window.innerWidth < 640 || window.innerWidth / window.innerHeight < 1);
+      stateRef.current.camTargetPos = new THREE.Vector3(
+        0, 
+        isMob ? 60 : (isCompact ? 50 : 75), 
+        isMob ? 82 : (isCompact ? 70 : 100)
+      );
+      stateRef.current.camLookAtTarget = (isMob && isCompact) ? new THREE.Vector3(0, -6, 0) : new THREE.Vector3(0, 0, 0);
       stateRef.current.isTransitioning = true;
       sound.playFlyTo();
       return;
@@ -192,13 +193,17 @@ export const SolarSystemCanvas: React.FC<SolarSystemCanvasProps> = ({
     stateRef.current.scene = scene;
 
     // Camera
-    const camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 2000);
-    const initialCamPos = isCompact
-      ? new THREE.Vector3(-14, 46, 68)
-      : new THREE.Vector3(0, 75, 100);
+    const isMobilePortrait = width < 640 || width / height < 1;
+    const fov = isMobilePortrait ? 52 : 45;
+    const camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 2000);
+    const initialCamPos = new THREE.Vector3(
+      0, 
+      isMobilePortrait ? 60 : (isCompact ? 50 : 75), 
+      isMobilePortrait ? 82 : (isCompact ? 70 : 100)
+    );
     camera.position.copy(initialCamPos);
-    const initialTarget = isCompact ? new THREE.Vector3(10, 0, 0) : new THREE.Vector3(0, 0, 0);
-    camera.lookAt(initialTarget);
+    const initialLookAt = (isMobilePortrait && isCompact) ? new THREE.Vector3(0, -6, 0) : new THREE.Vector3(0, 0, 0);
+    camera.lookAt(initialLookAt);
     stateRef.current.camera = camera;
 
     // Renderer
@@ -216,12 +221,14 @@ export const SolarSystemCanvas: React.FC<SolarSystemCanvasProps> = ({
 
     // Controls
     const controls = new OrbitControls(camera, renderer.domElement);
-    controls.target.copy(initialTarget);
     controls.enableDamping = true;
     controls.dampingFactor = 0.05;
     controls.minDistance = 2;
     controls.maxDistance = 350;
     controls.maxPolarAngle = Math.PI / 2 + 0.15; // Don't flip under
+    if (isMobilePortrait && isCompact) {
+      controls.target.copy(initialLookAt);
+    }
     stateRef.current.controls = controls;
 
     // Lighting
@@ -577,6 +584,8 @@ export const SolarSystemCanvas: React.FC<SolarSystemCanvasProps> = ({
       if (!container || !renderer || !camera) return;
       const newW = container.clientWidth;
       const newH = container.clientHeight;
+      const isMob = newW < 640 || newW / newH < 1;
+      camera.fov = isMob ? 52 : 45;
       camera.aspect = newW / newH;
       camera.updateProjectionMatrix();
       renderer.setSize(newW, newH);
