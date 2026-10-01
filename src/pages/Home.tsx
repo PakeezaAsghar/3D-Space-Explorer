@@ -86,8 +86,8 @@ export const Home: React.FC = () => {
       {/* =========================================================================
           HERO SECTION: Live Interactive 3D Solar System Cockpit
       ========================================================================== */}
-      <section className="relative w-full h-[92vh] min-h-[640px] flex items-center justify-center overflow-hidden border-b border-white/10">
-        {/* Live 3D Canvas Background */}
+      <section className="relative w-full min-h-[92vh] flex items-center overflow-hidden border-b border-white/10 bg-[#05070f]">
+        {/* Layer 1: Full-Vibrancy Live 3D Canvas Background (z-0, 100% opacity) */}
         <div className="absolute inset-0 z-0">
           <SolarSystemCanvas
             selectedPlanetId={null}
@@ -103,16 +103,33 @@ export const Home: React.FC = () => {
           />
         </div>
 
-        {/* Ambient Gradient Overlays for high contrast */}
-        <div className="absolute inset-x-0 top-0 h-36 hero-fade-top pointer-events-none z-10" />
-        <div className="absolute inset-x-0 bottom-0 h-40 hero-fade-bottom pointer-events-none z-10" />
+        {/* Layer 2A: Atmospheric Readability Overlay (Desktop/Tablet: Horizontal Protection Zone) */}
+        <div 
+          aria-hidden="true"
+          className="hidden md:block absolute inset-0 z-10 pointer-events-none"
+          style={{
+            background: 'linear-gradient(90deg, rgba(5,7,15,0.96) 0%, rgba(5,7,15,0.91) 28%, rgba(5,7,15,0.72) 44%, rgba(5,7,15,0.36) 60%, rgba(5,7,15,0.08) 75%, transparent 100%)'
+          }}
+        />
 
-        {/* Floating Hero Simulation HUD Controller (Top Right) */}
-        <div className="absolute top-6 right-6 z-30 hidden sm:flex items-center gap-2 p-1.5 rounded-2xl bg-slate-950/80 border border-white/15 backdrop-blur-md shadow-2xl">
+        {/* Layer 2B: Atmospheric Readability Overlay (Mobile: Vertical Protection Zone) */}
+        <div 
+          aria-hidden="true"
+          className="md:hidden absolute inset-0 z-10 pointer-events-none"
+          style={{
+            background: 'linear-gradient(180deg, rgba(5,7,15,0.96) 0%, rgba(5,7,15,0.91) 40%, rgba(5,7,15,0.58) 65%, rgba(5,7,15,0.12) 82%, transparent 100%)'
+          }}
+        />
+
+        {/* Ambient Top & Bottom Vignette Fades */}
+        <div className="absolute inset-x-0 top-0 h-28 hero-fade-top pointer-events-none z-10 opacity-70" />
+        <div className="absolute inset-x-0 bottom-0 h-36 hero-fade-bottom pointer-events-none z-10 opacity-70" />
+
+        {/* Layer 3: Floating Hero Simulation HUD Controller (Top Right, z-30) */}
+        <div className="absolute top-5 right-5 sm:top-6 sm:right-6 z-30 flex items-center gap-2 p-1.5 rounded-2xl bg-slate-950/60 border border-white/15 backdrop-blur-md shadow-2xl pointer-events-auto">
           <button
             type="button"
             onClick={() => {
-              sound.playClick();
               setIsHeroSimRunning(prev => !prev);
             }}
             className={`p-2 rounded-xl transition-all cursor-pointer ${
@@ -134,7 +151,6 @@ export const Home: React.FC = () => {
                 key={speed}
                 type="button"
                 onClick={() => {
-                  sound.playClick();
                   setHeroSpeed(speed);
                 }}
                 className={`px-2.5 py-1 rounded-lg text-xs font-mono transition-all cursor-pointer ${
@@ -149,58 +165,68 @@ export const Home: React.FC = () => {
           </div>
         </div>
 
-        {/* Floating Hero Content Overlay */}
-        <div className="relative z-20 max-w-4xl mx-auto px-4 text-center pointer-events-none">
-          {/* Scientific Status Tagline */}
-          <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/85 border border-cyan-500/30 text-xs font-mono text-cyan-300 mb-6 backdrop-blur-md pointer-events-auto shadow-2xl shadow-cyan-950/50">
-            <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
-            <span>8 PLANETS</span>
-            <span aria-hidden="true" className="text-slate-600">·</span>
-            <span>1 STAR</span>
-            <span aria-hidden="true" className="text-slate-600">·</span>
-            <span>290+ MOONS</span>
-            <span aria-hidden="true" className="text-slate-600">·</span>
-            <span>KEPLERIAN PHYSICS</span>
-          </div>
+        {/* Layer 4: Protected Hero Content Zone (Left 38-45% on Desktop, Stacked on Mobile, z-20) */}
+        <div className="relative z-20 w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 sm:py-20 md:py-28 pointer-events-none">
+          <div className="max-w-xl lg:max-w-2xl text-left">
+            {/* Scientific Status Tagline Badge */}
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/60 border border-cyan-500/30 text-xs font-mono text-cyan-300 mb-5 backdrop-blur-md pointer-events-auto shadow-xl shadow-cyan-950/40">
+              <span className="w-2 h-2 rounded-full bg-cyan-400 animate-pulse" />
+              <span>8 PLANETS</span>
+              <span aria-hidden="true" className="text-slate-600">·</span>
+              <span>1 STAR</span>
+              <span aria-hidden="true" className="text-slate-600">·</span>
+              <span>290+ MOONS</span>
+              <span aria-hidden="true" className="text-slate-600 hidden sm:inline">·</span>
+              <span className="hidden sm:inline">KEPLERIAN PHYSICS</span>
+            </div>
 
-          {/* Main Cinematic Heading */}
-          <h1
-            className="text-4xl sm:text-6xl md:text-7xl font-bold font-display tracking-tight hero-title-white !text-white mb-6 uppercase text-balance drop-shadow-2xl"
-            style={{ color: '#ffffff' }}
-          >
-            EXPLORE <br className="hidden sm:inline" />
-            <span className="!text-white" style={{ color: '#ffffff' }}>
-              THE SOLAR SYSTEM
-            </span>
-          </h1>
-
-          {/* Supporting Text */}
-          <p
-            className="text-base sm:text-lg hero-subtitle-white !text-white/95 max-w-2xl mx-auto mb-8 font-sans leading-relaxed text-balance"
-            style={{ color: 'rgba(255, 255, 255, 0.95)' }}
-          >
-            Enter an interactive digital planetarium and discover the worlds orbiting our Sun with real-time 3D planetary physics, procedural surface shaders, and NASA ephemeris data.
-          </p>
-
-          {/* Action CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pointer-events-auto mb-8">
-            <Link
-              to="/explore"
-              onClick={() => sound.playClick()}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl font-bold text-sm text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-xl shadow-cyan-500/30 flex items-center justify-center gap-2.5 transition-all cursor-pointer group uppercase"
+            {/* Main Cinematic Heading with clamp() and refined shadow protection */}
+            <h1
+              className="text-[clamp(2.35rem,5.2vw,4.5rem)] font-extrabold font-display tracking-tight leading-[1.08] text-white uppercase mb-5"
+              style={{
+                textShadow: '0 2px 12px rgba(0, 0, 0, 0.95), 0 4px 28px rgba(0, 0, 0, 0.85)'
+              }}
             >
-              <Compass className="w-4 h-4 text-slate-950 group-hover:rotate-45 transition-transform" />
-              <span>Explore planets</span>
-            </Link>
+              EXPLORE <br />
+              <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-cyan-300 drop-shadow-[0_2px_10px_rgba(0,0,0,0.85)]">
+                THE SOLAR SYSTEM
+              </span>
+            </h1>
 
-            <Link
-              to="/planets"
-              onClick={() => sound.playClick()}
-              className="w-full sm:w-auto px-8 py-4 rounded-xl font-semibold text-sm text-white glass-panel hover:bg-white/10 border border-white/20 flex items-center justify-center gap-2 transition-all cursor-pointer backdrop-blur-md uppercase"
+            {/* Supporting Text */}
+            <p
+              className="text-sm sm:text-base md:text-lg text-slate-200/95 max-w-lg mb-8 font-sans leading-relaxed text-pretty"
+              style={{
+                textShadow: '0 1px 8px rgba(0, 0, 0, 0.95)'
+              }}
             >
-              <span>View planets</span>
-              <ArrowRight className="w-4 h-4 text-cyan-400" />
-            </Link>
+              Enter an interactive digital planetarium and discover the worlds orbiting our Sun with real-time 3D planetary physics, procedural surface shaders, and NASA ephemeris data.
+            </p>
+
+            {/* Action CTAs */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3.5 pointer-events-auto mb-6">
+              <Link
+                to="/explore"
+                className="px-7 py-3.5 rounded-xl font-bold text-sm text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-xl shadow-cyan-500/25 flex items-center justify-center gap-2.5 transition-all cursor-pointer group uppercase tracking-wider"
+              >
+                <Compass className="w-4 h-4 text-slate-950 group-hover:rotate-45 transition-transform" />
+                <span>Explore planets</span>
+              </Link>
+
+              <Link
+                to="/planets"
+                className="px-7 py-3.5 rounded-xl font-semibold text-sm text-white glass-panel hover:bg-white/10 border border-white/20 flex items-center justify-center gap-2 transition-all cursor-pointer backdrop-blur-md uppercase tracking-wider"
+              >
+                <span>View planets</span>
+                <ArrowRight className="w-4 h-4 text-cyan-400" />
+              </Link>
+            </div>
+
+            {/* Subtle Interactive Telemetry Guidance */}
+            <div className="flex items-center gap-2 text-[11px] font-mono text-slate-400/90 pointer-events-none drop-shadow-[0_1px_4px_rgba(0,0,0,0.9)]">
+              <span className="w-1.5 h-1.5 rounded-full bg-cyan-400/80" />
+              <span>Real-time 3D WebGL · Drag to orbit · Click planet to inspect</span>
+            </div>
           </div>
         </div>
       </section>

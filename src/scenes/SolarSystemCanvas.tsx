@@ -40,6 +40,49 @@ interface ScreenLabel {
   color: string;
 }
 
+// Responsive camera framing:
+// For Hero mode (isCompact === true), positions the revolving solar system gracefully in the right 60-65%
+// on desktop and lower half on mobile, leaving the text zone clear and unobstructed.
+const getCameraFraming = (w: number, h: number, isCompactMode: boolean) => {
+  if (!isCompactMode) {
+    const isMob = w < 640 || w / h < 1;
+    return {
+      pos: new THREE.Vector3(0, isMob ? 60 : 75, isMob ? 82 : 100),
+      target: new THREE.Vector3(0, 0, 0),
+      fov: isMob ? 52 : 45
+    };
+  }
+
+  const isMobile = w < 768 || w / h < 0.95;
+  const isTablet = w >= 768 && w < 1024;
+
+  if (isMobile) {
+    // Vertically shift solar system downward on mobile so top text is safe
+    return {
+      pos: new THREE.Vector3(0, 56, 80),
+      target: new THREE.Vector3(0, -12, 0),
+      fov: 52
+    };
+  }
+
+  if (isTablet) {
+    // Shift solar system rightward on tablet
+    return {
+      pos: new THREE.Vector3(-11, 48, 74),
+      target: new THREE.Vector3(-11, -2, 0),
+      fov: 48
+    };
+  }
+
+  // Desktop (>= 1024px):
+  // Shift center rightward by aiming camera at -18, putting the Sun (at 0,0,0) around 62-65% width
+  return {
+    pos: new THREE.Vector3(-18, 44, 72),
+    target: new THREE.Vector3(-18, 0, 0),
+    fov: 45
+  };
+};
+
 export const SolarSystemCanvas: React.FC<SolarSystemCanvasProps> = ({
   selectedPlanetId,
   onSelectPlanet,
@@ -119,14 +162,12 @@ export const SolarSystemCanvas: React.FC<SolarSystemCanvasProps> = ({
     if (!camera || !controls) return;
 
     if (!selectedPlanetId) {
-      // Zoom out to global solar system view
-      const isMob = typeof window !== 'undefined' && (window.innerWidth < 640 || window.innerWidth / window.innerHeight < 1);
-      stateRef.current.camTargetPos = new THREE.Vector3(
-        0, 
-        isMob ? 60 : (isCompact ? 50 : 75), 
-        isMob ? 82 : (isCompact ? 70 : 100)
-      );
-      stateRef.current.camLookAtTarget = (isMob && isCompact) ? new THREE.Vector3(0, -6, 0) : new THREE.Vector3(0, 0, 0);
+      // Zoom out to global solar system view with responsive hero framing
+      const curW = containerRef.current?.clientWidth || (typeof window !== 'undefined' ? window.innerWidth : 1200);
+      const curH = containerRef.current?.clientHeight || (typeof window !== 'undefined' ? window.innerHeight : 800);
+      const framing = getCameraFraming(curW, curH, isCompact);
+      stateRef.current.camTargetPos = framing.pos;
+      stateRef.current.camLookAtTarget = framing.target;
       stateRef.current.isTransitioning = true;
       sound.playFlyTo();
       return;
@@ -192,18 +233,11 @@ export const SolarSystemCanvas: React.FC<SolarSystemCanvasProps> = ({
     scene.background = new THREE.Color(0x05070f);
     stateRef.current.scene = scene;
 
-    // Camera
-    const isMobilePortrait = width < 640 || width / height < 1;
-    const fov = isMobilePortrait ? 52 : 45;
-    const camera = new THREE.PerspectiveCamera(fov, width / height, 0.1, 2000);
-    const initialCamPos = new THREE.Vector3(
-      0, 
-      isMobilePortrait ? 60 : (isCompact ? 50 : 75), 
-      isMobilePortrait ? 82 : (isCompact ? 70 : 100)
-    );
-    camera.position.copy(initialCamPos);
-    const initialLookAt = (isMobilePortrait && isCompact) ? new THREE.Vector3(0, -6, 0) : new THREE.Vector3(0, 0, 0);
-    camera.lookAt(initialLookAt);
+    // Camera with responsive framing
+    const framing = getCameraFraming(width, height, isCompact);
+    const camera = new THREE.PerspectiveCamera(framing.fov, width / height, 0.1, 2000);
+    camera.position.copy(framing.pos);
+    camera.lookAt(framing.target);
     stateRef.current.camera = camera;
 
     // Renderer
@@ -226,9 +260,7 @@ export const SolarSystemCanvas: React.FC<SolarSystemCanvasProps> = ({
     controls.minDistance = 2;
     controls.maxDistance = 350;
     controls.maxPolarAngle = Math.PI / 2 + 0.15; // Don't flip under
-    if (isMobilePortrait && isCompact) {
-      controls.target.copy(initialLookAt);
-    }
+    controls.target.copy(framing.target);
     stateRef.current.controls = controls;
 
     // Lighting
@@ -581,14 +613,17 @@ export const SolarSystemCanvas: React.FC<SolarSystemCanvasProps> = ({
 
     // Resize Handler
     const handleResize = () => {
-      if (!container || !renderer || !camera) return;
+      if (!container || !renderer || !camera || !controls) return;
       const newW = container.clientWidth;
       const newH = container.clientHeight;
-      const isMob = newW < 640 || newW / newH < 1;
-      camera.fov = isMob ? 52 : 45;
+      const framing = getCameraFraming(newW, newH, isCompact);
+      camera.fov = framing.fov;
       camera.aspect = newW / newH;
       camera.updateProjectionMatrix();
       renderer.setSize(newW, newH);
+      if (!propsRef.current.selectedPlanetId && !stateRef.current.isTransitioning) {
+        controls.target.copy(framing.target);
+      }
     };
 
     window.addEventListener('resize', handleResize);
@@ -810,8 +845,8 @@ export const SolarSystemCanvas: React.FC<SolarSystemCanvasProps> = ({
                     isSelected
                       ? 'bg-cyan-500/20 text-cyan-200 border border-cyan-400/60 shadow-lg shadow-cyan-500/20'
                       : isHovered
-                      ? 'bg-slate-900/90 text-white border border-slate-400/50 scale-105'
-                      : 'bg-slate-950/70 text-slate-300 border border-white/10 hover:border-white/30'
+                      ? 'bg-slate-900/60 text-white border border-slate-400/50 scale-105 backdrop-blur-xs'
+                      : 'bg-slate-950/25 text-slate-300 border border-white/10 hover:border-white/30 hover:bg-slate-900/40 backdrop-blur-xs'
                   }`}
                 >
                   <span
