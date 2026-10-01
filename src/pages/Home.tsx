@@ -97,7 +97,7 @@ export const Home: React.FC = () => {
             simulationRunning={isHeroSimRunning}
             simulationSpeed={heroSpeed}
             showOrbits={true}
-            showLabels={true}
+            showLabels={false}
             showStars={true}
             isCompact={true}
           />
